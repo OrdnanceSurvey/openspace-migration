@@ -35,7 +35,7 @@ Map configuration options:
 
 Name | Type | Description
 --- | --- | ---
-`style` | *string* | Map style (can be Leisure, Outdoor, Light, Road)
+`style` | *string* | Map style [possible values are `Leisure`, `Outdoor`, `Light` or `Road`]
 `center` | *array* | Map center (easting & northing)
 `zoom` | *integer* | Map zoom level
 `markers` | *object* | [see below]
