@@ -1,5 +1,7 @@
 // mapbuilder.js v0.1.0
 
+var map;
+
 function init() {
     var serviceUrl = 'https://api.os.uk/maps/raster/v1/zxy';
 
@@ -13,7 +15,7 @@ function init() {
     });
 
     // Initialize the map object.
-    var map = new ol.Map({
+    map = new ol.Map({
         layers: [
             new ol.layer.Tile({
                 source: new ol.source.XYZ({
@@ -284,6 +286,7 @@ function init() {
             // Define the text string to show inside the marker cluster icon.
             // This will be the number of grouped features (if less than 10) or '10+' (if greater).
             var textString = size >= 10 ? '10+' : size.toString();
+
             style = new ol.style.Style({
                 image: new ol.style.Circle({
                     radius: 15,
@@ -292,7 +295,7 @@ function init() {
                     })
                 }),
                 text: new ol.style.Text({
-                    font: '12px sans-serif',
+                    font: 'bold 12px sans-serif',
                     text: textString,
                     fill: new ol.style.Fill({
                         color: '#fff'
