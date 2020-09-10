@@ -1,6 +1,8 @@
 # OpenSpace Migration
 
-JavaScript file to assist those customers who have previously developed their website content using the OpenSpace Web Map Builder.
+JavaScript wrapper file to display Ordnance Survey maps with markers and/or a route.
+
+**IMPORTANT: Use of this JavaScript file requires a valid API key. Please sign up to the [OS Data Hub](https://osdatahub.os.uk) and acquire a project API key before going any further.**
 
 ## Installation
 
@@ -44,7 +46,7 @@ Marker options:
 
 Name | Type | Description
 --- | --- | ---
-`color` | *string* | Hexadecimal colour value for the styling the markers
+`color` | *string* | Hexadecimal colour value (can also be an HTML [colour name](https://www.w3schools.com/colors/colors_names.asp)) for the styling the markers
 `interactive` | *boolean* | Whether on not the markers are interactive (clickable)
 
 ## Markers

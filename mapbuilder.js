@@ -1,6 +1,6 @@
 // mapbuilder.js v0.1.0
 
-var map;
+var map, routeLayer, routeMarkerLayer, markerLayer;
 
 function init() {
     var serviceUrl = 'https://api.os.uk/maps/raster/v1/zxy';
@@ -42,7 +42,7 @@ function init() {
             { features: routeFeature } :
             { url: routeFeature, format: new ol.format.GPX() };
 
-        var routeLayer = new ol.layer.Vector({
+        routeLayer = new ol.layer.Vector({
             name: 'route',
             source: new ol.source.Vector(routeSourceObj),
             style: new ol.style.Style({
@@ -55,7 +55,7 @@ function init() {
         map.addLayer(routeLayer);
 
         // Add a route markers to the map.
-        var routeMarkerLayer = new ol.layer.Vector({
+        routeMarkerLayer = new ol.layer.Vector({
             name: 'routeMarker',
             source: new ol.source.Vector({
                 features: []
@@ -76,7 +76,7 @@ function init() {
 
     if( typeof markerFeatures !== 'undefined' ) {
         // Add the cluster markers to the map.
-        var markerLayer = new ol.layer.Vector({
+        markerLayer = new ol.layer.Vector({
             name: 'marker',
             source: new ol.source.Cluster({
                 source: new ol.source.Vector({
@@ -275,7 +275,8 @@ function init() {
                 img: img,
                 imgSize: [ 48, 48 ],
                 scale: 0.75
-            })
+            }),
+            zIndex: 1
         });
 
         var size = feature.get('features').length;
@@ -284,8 +285,11 @@ function init() {
         // Otherwise style the single feature using a standard marker icon.
         if( size > 1 ) {
             // Define the text string to show inside the marker cluster icon.
-            // This will be the number of grouped features (if less than 10) or '10+' (if greater).
-            var textString = size >= 10 ? '10+' : size.toString();
+            var textString = (size < 10) ? size.toString() :
+                (size >= 10 && size < 20) ? '10+' :
+                (size >= 20 && size < 30) ? '20+' :
+                (size >= 30 && size < 50) ? '30+' :
+                '50+';
 
             style = new ol.style.Style({
                 image: new ol.style.Circle({
@@ -300,7 +304,8 @@ function init() {
                     fill: new ol.style.Fill({
                         color: '#fff'
                     })
-                })
+                }),
+                zIndex: 2
             });
         }
 
