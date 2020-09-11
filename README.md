@@ -6,10 +6,16 @@ JavaScript wrapper file to display Ordnance Survey maps with markers and/or a ro
 
 ## Examples
 
+Live versions of the included examples to demonstrate usage:
+
 - [Basic map](https://labs.os.uk/public/openspace-migration/src/examples/basic-map.html)
+  - Create a simple map.
 - [Location map](https://labs.os.uk/public/openspace-migration/src/examples/location-map.html)
+  - Display a marker icon.
 - [Route map](https://labs.os.uk/public/openspace-migration/src/examples/route-map.html)
+  - Add a route.
 - [Route map (GPX)](https://labs.os.uk/public/openspace-migration/src/examples/route-map-gpx.html)
+  - Overlay a route using an external GPX file.
 
 ## Installation
 
