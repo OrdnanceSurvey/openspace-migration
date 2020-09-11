@@ -4,6 +4,13 @@ JavaScript wrapper file to display Ordnance Survey maps with markers and/or a ro
 
 **IMPORTANT: Use of this JavaScript file requires a valid API key. Please sign up to the [OS Data Hub](https://osdatahub.os.uk) and acquire a project API key before going any further.**
 
+## Examples
+
+- [Basic map](https://labs.os.uk/public/openspace-migration/src/examples/basic-map.html)
+- [Location map](https://labs.os.uk/public/openspace-migration/src/examples/location-map.html)
+- [Route map](https://labs.os.uk/public/openspace-migration/src/examples/route-map.html)
+- [Route map (GPX)](https://labs.os.uk/public/openspace-migration/src/examples/route-map-gpx.html)
+
 ## Installation
 
 Include the following `<script>` tag in the header section of your HTML document:
