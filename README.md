@@ -114,3 +114,9 @@ Alternatively, if you have captured your route as a GPX file - it can be added a
 ```js
 var routeFeature = 'route.gpx';
 ```
+
+## Licence
+
+The contents of this repository are licensed under the [Open Government Licence 3.0](https://www.nationalarchives.gov.uk/doc/open-government-licence/version/)
+
+![Logo](http://www.nationalarchives.gov.uk/images/infoman/ogl-symbol-41px-retina-black.png "OGL logo")
