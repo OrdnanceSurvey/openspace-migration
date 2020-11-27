@@ -152,6 +152,7 @@ Once you have set your map configuration options; along with [optionally] adding
 ## Notes
 
 <sup>[1]</sup> Access to the 1:50 000 and 1:25 000 Scale Colour Raster datasets which are provided via the Leisure style require a valid OS Data Hub project API key with a [Premium plan](https://osdatahub.os.uk/plans).
+
 <sup>[2]</sup> You will need to ensure that the OS Names API is included in your project to utilise the gazetteer search functionality.
 
 ## Licence
