@@ -2,7 +2,7 @@
 
 JavaScript wrapper file to display Ordnance Survey maps with markers and/or a route.
 
-**IMPORTANT: Use of this JavaScript file requires a valid API key. Please sign up to the [OS Data Hub](https://osdatahub.os.uk) and acquire a project API key before going any further.**
+**IMPORTANT: Use of this JavaScript file requires a valid API key. Please sign up to the [OS Data Hub](https://osdatahub.os.uk) and acquire a project API key<sup>[1]</sup> before going any further.**
 
 ## Examples
 
@@ -16,6 +16,12 @@ Live versions of the included examples to demonstrate usage:
   - Add a route.
 - [Route map (GPX)](https://labs.os.uk/public/openspace-migration/src/examples/route-map-gpx.html)
   - Overlay a route using an external GPX file.
+- [Coordinate information](https://labs.os.uk/public/openspace-migration/src/examples/control-coordinates.html)
+  - Display coordinates of the mouse pointer.
+- [Gazetteer search](https://labs.os.uk/public/openspace-migration/src/examples/control-gazetteer.html)
+  - Incorporate a gazetteer search.
+- [Overview map](https://labs.os.uk/public/openspace-migration/src/examples/control-overview.html)
+  - Include an overview map.
 
 ## Installation
 
@@ -37,6 +43,11 @@ var mapConfig = {
     markers: {
         color: '#c00',
         interactive: true
+    },
+    controls: {
+        coordinates: false,
+        gazetteer: false,
+        overview: false
     }
 };
 
@@ -54,6 +65,7 @@ Name | Type | Description
 `center` | *array* | Map center (easting & northing)
 `zoom` | *integer* | Map zoom level
 `markers` | *object* | [see below]
+`controls` | *object* | [see below]
 
 Marker options:
 
@@ -61,6 +73,14 @@ Name | Type | Description
 --- | --- | ---
 `color` | *string* | Hexadecimal colour value (can also be an HTML [colour name](https://www.w3schools.com/colors/colors_names.asp)) for the styling the markers
 `interactive` | *boolean* | Whether on not the markers are interactive (clickable)
+
+Control options:
+
+Name | Type | Description
+--- | --- | ---
+`coordinates` | *boolean* | Whether of not to display coordinates of the mouse pointer
+`gazetteer` | *boolean* | Whether of not to incorporate a gazetteer search<sup>[2]</sup>
+`overview` | *boolean* | Whether of not to include an overview map
 
 ## Markers
 
@@ -89,6 +109,8 @@ var markerFeatures = [
 
 This is an array of one or more point features which are defined by a `geometry` (easting & northing) and `content` (string or element of HTML to display within the popup) key-value pair.
 
+An optional `color` key - with an associated hexadecimal colour value (or HTML colour name) - can also be included if you wish to assign different colours to the individual markers.
+
 ## Routes
 
 A route can be added to the map using a `LineString` geometry made up of a sequence of easting & northing coordinate pairs:
@@ -114,6 +136,23 @@ Alternatively, if you have captured your route as a GPX file - it can be added a
 ```js
 var routeFeature = 'route.gpx';
 ```
+
+## Final Map
+
+Once you have set your map configuration options; along with [optionally] adding any markers and/or a route - your completed Ordnance Survey map will be displayed using the `init();` function call.
+
+## Change Log
+
+**Version 0.1.0** (September 2020)
+- Initial release.
+
+**Version 0.2.0** (November 2020)
+- Includes support for assigning different colours to individual markers; along with the option to incorporate map controls (coordinate information + gazetteer search + overview map).
+
+## Notes
+
+<sup>[1]</sup> Access to the 1:50 000 and 1:25 000 Scale Colour Raster datasets which are provided via the Leisure style require a valid OS Data Hub project API key with a [Premium plan](https://osdatahub.os.uk/plans).
+<sup>[2]</sup> You will need to ensure that the OS Names API is included in your project to utilise the gazetteer search functionality.
 
 ## Licence
 

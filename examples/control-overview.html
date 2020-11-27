@@ -18,7 +18,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/proj4js/2.5.0/proj4.js"></script>
 <script src="https://unpkg.com/ol-popup@4.0.0"></script>
 <script src="https://unpkg.com/ol-geocoder@4.0.0"></script>
-<script src="mapbuilder.js"></script>
+<script src="../mapbuilder.js"></script>
 <script>
 
     var apiKey = 'INSERT_API_KEY_HERE';
@@ -34,12 +34,9 @@
         controls: {
             coordinates: false,
             gazetteer: false,
-            overview: false
+            overview: true
         }
     };
-
-    // OPTIONAL: var markerFeatures = [];
-    // OPTIONAL: var routeFeature = [];
 
     init();
 

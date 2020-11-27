@@ -10,7 +10,7 @@
 </head>
 <body>
 
-<div id="map" style="position:absolute; border:1px solid black; width:540px; height:440px;"></div>
+<div id="map" style="position:absolute; border:1px solid black; width:700px; height:440px;"></div>
 
 <script src="https://labs.os.uk/public/os-api-branding/v0.2.0/os-api-branding.js"></script>
 <script src="https://cdn.jsdelivr.net/gh/openlayers/openlayers.github.io@master/en/v6.4.3/build/ol.js"></script>
@@ -28,6 +28,11 @@
         markers: {
             color: '#c00',
             interactive: true
+        },
+        controls: {
+            coordinates: false,
+            gazetteer: false,
+            overview: false
         }
     };
 

@@ -1,33 +1,50 @@
-// mapbuilder.js v0.1.0
+// mapbuilder.js v0.2.0
 
 var map, routeLayer, routeMarkerLayer, markerLayer;
+var styles = '';
 
 function init() {
-    var serviceUrl = 'https://api.os.uk/maps/raster/v1/zxy';
+    var tileServiceUrl = 'https://api.os.uk/maps/raster/v1/zxy',
+        nameServiceUrl = 'https://api.os.uk/search/names/v1';
 
     // Setup the EPSG:27700 (British National Grid) projection.
     proj4.defs("EPSG:27700", "+proj=tmerc +lat_0=49 +lon_0=-2 +k=0.9996012717 +x_0=400000 +y_0=-100000 +ellps=airy +towgs84=446.448,-125.157,542.06,0.15,0.247,0.842,-20.489 +units=m +no_defs");
     ol.proj.proj4.register(proj4);
+
+    var extent = [ -238375.0, 0.0, 900000.0, 1376256.0 ];
 
     var tilegrid = new ol.tilegrid.TileGrid({
         resolutions: [ 896.0, 448.0, 224.0, 112.0, 56.0, 28.0, 14.0, 7.0, 3.5, 1.75 ],
         origin: [ -238375.0, 1376256.0 ]
     });
 
+    var tileSource = new ol.source.XYZ({
+        url: tileServiceUrl + '/' + mapConfig.style + '_27700/{z}/{x}/{y}.png?key=' + apiKey,
+        projection: 'EPSG:27700',
+        tileGrid: tilegrid
+    });
+
+    var overviewMapControl = new ol.control.OverviewMap({
+        className: 'ol-overviewmap ol-custom-overviewmap',
+        collapsible: false,
+        layers: [
+            new ol.layer.Tile({
+                source: tileSource
+            })
+        ]
+    });
+
     // Initialize the map object.
     map = new ol.Map({
         layers: [
             new ol.layer.Tile({
-                source: new ol.source.XYZ({
-                    url: serviceUrl + '/' + mapConfig.style + '_27700/{z}/{x}/{y}.png?key=' + apiKey,
-                    projection: 'EPSG:27700',
-                    tileGrid: tilegrid
-                })
+                source: tileSource
             })
         ],
         target: 'map',
         view: new ol.View({
             projection: 'EPSG:27700',
+            extent: extent,
             resolutions: tilegrid.getResolutions(),
             minZoom: 0,
             maxZoom: 9,
@@ -35,6 +52,51 @@ function init() {
             zoom: mapConfig.zoom
         })
     });
+
+    if( mapConfig.controls.coordinates ) {
+        document.getElementById('map').insertAdjacentHTML('afterbegin', '<div id="info" style="display:block; position:absolute; margin:auto 25%; width:50%; padding:10px 0; border:none; border-radius:0 0 3px 3px; text-align:center; color:#fff; background:#333; z-index:9999;"></div>');
+    }
+
+    if( mapConfig.controls.gazetteer ) {
+        styles += `.ol-geocoder .gcd-gl-btn { background-image:url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNSIgaGVpZ2h0PSIxNSIgdmlld0JveD0iMCAwIDMwIDMwIj4KPHBhdGggZD0iTTIwLjE5NCwzLjQ2Yy00LjYxMy00LjYxMy0xMi4xMjEtNC42MTMtMTYuNzM0LDBjLTQuNjEyLDQuNjE0LTQuNjEyLDEyLjEyMSwwLDE2LjczNWM0LjEwOCw0LjEwNywxMC41MDYsNC41NDcsMTUuMTE2LDEuMzRjMC4wOTcsMC40NTksMC4zMTksMC44OTcsMC42NzYsMS4yNTRsNi43MTgsNi43MThjMC45NzksMC45NzcsMi41NjEsMC45NzcsMy41MzUsMGMwLjk3OC0wLjk3OCwwLjk3OC0yLjU2LDAtMy41MzVsLTYuNzE4LTYuNzJjLTAuMzU1LTAuMzU0LTAuNzk0LTAuNTc3LTEuMjUzLTAuNjc0QzI0Ljc0MywxMy45NjcsMjQuMzAzLDcuNTcsMjAuMTk0LDMuNDZ6TTE4LjA3MywxOC4wNzRjLTMuNDQ0LDMuNDQ0LTkuMDQ5LDMuNDQ0LTEyLjQ5MiwwYy0zLjQ0Mi0zLjQ0NC0zLjQ0Mi05LjA0OCwwLTEyLjQ5MmMzLjQ0My0zLjQ0Myw5LjA0OC0zLjQ0MywxMi40OTIsMEMyMS41MTcsOS4wMjYsMjEuNTE3LDE0LjYzLDE4LjA3MywxOC4wNzR6IiBmaWxsPSIjZmZmIi8+Cjwvc3ZnPg=="); } .ol-geocoder ul.gcd-gl-result { max-height:13.75em; } `;
+
+        // Set the provider (passing any options that are required).
+        var provider = osOpenNames({
+            url: nameServiceUrl + '/find',
+        });
+
+        // Instantiate the Geocoder control.
+        var geocoder = new Geocoder('nominatim', {
+            provider: provider,
+            autoComplete: true,
+            autoCompleteMinLength: 3,
+            placeholder: 'Search...',
+            targetType: 'glass-button',
+            lang: 'en',
+            keepOpen: false,
+            preventDefault: true
+        });
+        map.addControl(geocoder);
+
+        // Event handler which is triggered when an address is chosen.
+        geocoder.on('addresschosen', function(evt) {
+            if( evt.bbox )
+                map.getView().fit(evt.bbox, { duration: 500 });
+            else
+                map.getView().animate({ zoom: 9, center: evt.coordinate });
+        });
+    }
+
+    if( mapConfig.controls.overview ) {
+        styles += `.ol-custom-overviewmap, .ol-custom-overviewmap.ol-uncollapsible { top:auto; bottom:24px; left:auto; right:8px; } `;
+
+        map.controls.push(overviewMapControl);
+    }
+
+    var styleSheet = document.createElement('style');
+    styleSheet.type = 'text/css';
+    styleSheet.innerText = styles;
+    document.head.appendChild(styleSheet);
 
     if( typeof routeFeature !== 'undefined' ) {
         // Add a route to the map.
@@ -137,12 +199,110 @@ function init() {
             });
 
             map.getViewport().style.cursor = hit ? 'pointer' : '';
+
+            if( mapConfig.controls.coordinates ) {
+                var templateOSGB = 'Easting: {x} Northing: {y}';
+                var strOSGB = ol.coordinate.format(evt.coordinate, templateOSGB, 0);
+
+                var templateWGS84 = 'Longitude: {x} Latitude: {y}';
+                var strWGS84 = ol.coordinate.format(ol.proj.transform(evt.coordinate, 'EPSG:27700', 'EPSG:4326'), templateWGS84, 6);
+
+                var gridRef = toGridRef({ ea: evt.coordinate[0], no: evt.coordinate[1] });
+                var strGridRef = 'OS Grid Reference: ' + gridRef.text;
+
+                document.getElementById('info').innerHTML = strOSGB + '<br>' + strWGS84 + '<br>' + strGridRef;
+            }
         });
 
         // Create a 'change:resolution' event handler which hides any popups when view resolution changes.
         map.getView().on('change:resolution', function(evt) {
             popup.hide();
         });
+    }
+
+    /**
+     * Custom provider for OS Names API.
+     * Factory function which returns an object with the methods 'getParameters'
+     * and 'handleResponse' called by the Geocoder.
+     */
+    function osOpenNames(options) {
+        var url = options.url;
+        return {
+            getParameters: function(opt) {
+                return {
+                    url: url,
+                    params: {
+                        key: apiKey,
+                        query: opt.query,
+                        maxresults: 5
+                    }
+                };
+            },
+            handleResponse: function(data) {
+                // On error show alert with returned error message.
+                if( data.error ) {
+                    alert('Error: ' + data.error.message);
+                    return;
+                }
+
+                var response = [];
+
+                if( data.header.totalresults > 0 ) {
+                    data.results.forEach(function(val, i) {
+                        var result = val.GAZETTEER_ENTRY;
+
+                        // Transform the returned coordinates into latitude and longitude.
+                        var coords = ol.proj.transform(
+                            [ result.GEOMETRY_X, result.GEOMETRY_Y ],
+                            'EPSG:27700',
+                            'EPSG:4326'
+                        );
+
+                        // Generate the populated place string.
+                        var name = result.NAME1;
+                        if( result.NAME2 ) {
+                            name += '/';
+                            name += result.NAME2;
+                        }
+                        name = name.toUpperCase();
+
+                        var entity = [ name ];
+                        if( result.POPULATED_PLACE ) {
+                            entity.push(result.POPULATED_PLACE);
+                        }
+                        if( result.DISTRICT_BOROUGH ) {
+                            entity.push(result.DISTRICT_BOROUGH);
+                        }
+                        if( result.COUNTY_UNITARY ) {
+                            entity.push(result.COUNTY_UNITARY);
+                        }
+                        entity.push(result.REGION);
+                        entity.push(result.COUNTRY);
+
+                        entity = entity.filter((item, index) => entity.indexOf(item) === index);
+
+                        response[i] = {
+                            lon: coords[0],
+                            lat: coords[1],
+                            address: {
+                                name: entity.join(', ')
+                            }
+                        };
+
+                        // Add transformed bounding box value to the response.
+                        // Minimum bounding rectangle (MBR) is returned for all features except postcodes.
+                        if( result.MBR_XMIN && result.MBR_YMIN && result.MBR_XMAX && result.MBR_YMAX )
+                            response[i].bbox = ol.proj.transformExtent(
+                                [ result.MBR_XMIN, result.MBR_YMIN, result.MBR_XMAX, result.MBR_YMAX ],
+                                'EPSG:27700',
+                                'EPSG:4326'
+                            );
+                    });
+                }
+
+                return response;
+            }
+        };
     }
 
     /**
@@ -260,11 +420,13 @@ function init() {
      * Returns data-driven style object for the marker clusters.
      */
     function markerStyle(feature) {
-        // Define an SVG object to be used for the marker icon.
-        var svg = `<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 141.7 141.7">
-                     <path fill="${mapConfig.markers.color}" d="m70.9 7.1c-24.8 0-44.9 16.5-44.9 48.4s44.9 79.1 44.9 79.1 44.9-47.2 44.9-79.1c-.1-31.9-20.2-48.4-44.9-48.4z"/>
-                     <path fill="#fff" d="m98.4 52.6c0 15.2-12.3 27.5-27.5 27.5s-27.6-12.3-27.6-27.5 12.4-27.6 27.6-27.6 27.5 12.4 27.5 27.6"/>
-                   </svg>`;
+      var color = feature.get('features')[0].get('color') || mapConfig.markers.color;
+
+      // Define an SVG object to be used for the marker icon.
+      var svg = `<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 141.7 141.7">
+                   <path fill="${color}" d="m70.9 7.1c-24.8 0-44.9 16.5-44.9 48.4s44.9 79.1 44.9 79.1 44.9-47.2 44.9-79.1c-.1-31.9-20.2-48.4-44.9-48.4z"/>
+                   <path fill="#fff" d="m98.4 52.6c0 15.2-12.3 27.5-27.5 27.5s-27.6-12.3-27.6-27.5 12.4-27.6 27.6-27.6 27.5 12.4 27.5 27.6"/>
+                 </svg>`;
 
         var img = new Image();
         img.src = 'data:image/svg+xml,' + escape(svg);
@@ -311,4 +473,41 @@ function init() {
 
         return style;
     }
+}
+
+/**
+ * Convert northing and easting to letter and number grid system.
+ */
+function toGridRef(coordinates) {
+    var prefixes = new Array(
+        new Array("SV","SW","SX","SY","SZ","TV","TW"),
+        new Array("SQ","SR","SS","ST","SU","TQ","TR"),
+        new Array("SL","SM","SN","SO","SP","TL","TM"),
+        new Array("SF","SG","SH","SJ","SK","TF","TG"),
+        new Array("SA","SB","SC","SD","SE","TA","TB"),
+        new Array("NV","NW","NX","NY","NZ","OV","OW"),
+        new Array("NQ","NR","NS","NT","NU","OQ","OR"),
+        new Array("NL","NM","NN","NO","NP","OL","OM"),
+        new Array("NF","NG","NH","NJ","NK","OF","OG"),
+        new Array("NA","NB","NC","ND","NE","OA","OB"),
+        new Array("HV","HW","HX","HY","HZ","JV","JW"),
+        new Array("HQ","HR","HS","HT","HU","JQ","JR"),
+        new Array("HL","HM","HN","HO","HP","JL","JM")
+    );
+
+    var x = Math.floor(coordinates.ea / 100000);
+    var y = Math.floor(coordinates.no / 100000);
+
+    var prefix = prefixes[y][x];
+
+    var e = Math.round(coordinates.ea % 100000);
+    var n = Math.round(coordinates.no % 100000);
+
+    e = String(e).padStart(5, '0');
+    n = String(n).padStart(5, '0');
+
+    var text = prefix + ' ' + e + ' ' + n,
+        html = prefix + '&thinsp;' + e + '&thinsp;' + n;
+
+    return { text: text, html: html };
 }
