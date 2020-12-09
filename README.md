@@ -149,6 +149,9 @@ Once you have set your map configuration options; along with [optionally] adding
 **Version 0.2.0** (November 2020)
 - Includes support for assigning different colours to individual markers; along with the option to incorporate map controls (coordinate information + gazetteer search + overview map).
 
+**Version 0.2.1** (December 2020)
+- Minor bug fixes; and new implementation of mouse position control for improved functionality on touch devices.
+
 ## Notes
 
 <sup>[1]</sup> Access to the 1:50 000 and 1:25 000 Scale Colour Raster datasets which are provided via the Leisure style require a valid OS Data Hub project API key with a [Premium plan](https://osdatahub.os.uk/plans).

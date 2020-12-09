@@ -1,4 +1,4 @@
-// mapbuilder.js v0.2.0
+// mapbuilder.js v0.2.1
 
 var map, routeLayer, routeMarkerLayer, markerLayer;
 var styles = '';
@@ -24,16 +24,6 @@ function init() {
         tileGrid: tilegrid
     });
 
-    var overviewMapControl = new ol.control.OverviewMap({
-        className: 'ol-overviewmap ol-custom-overviewmap',
-        collapsible: false,
-        layers: [
-            new ol.layer.Tile({
-                source: tileSource
-            })
-        ]
-    });
-
     // Initialize the map object.
     map = new ol.Map({
         layers: [
@@ -54,7 +44,16 @@ function init() {
     });
 
     if( mapConfig.controls.coordinates ) {
-        document.getElementById('map').insertAdjacentHTML('afterbegin', '<div id="info" style="display:block; position:absolute; margin:auto 25%; width:50%; padding:10px 0; border:none; border-radius:0 0 3px 3px; text-align:center; color:#fff; background:#333; z-index:9999;"></div>');
+        styles += `.custom-mouse-position { display:block; position:absolute; margin:auto 25%; width:50%; padding:10px 0; border:none; border-radius:0 0 3px 3px; text-align:center; color:#fff; background:#333; z-index:9999; } `;
+
+        // Define the mouse position control.
+        var mousePositionControl = new ol.control.MousePosition({
+            coordinateFormat: getCoordinateString,
+            className: 'custom-mouse-position',
+            undefinedHTML: '',
+        });
+
+        map.controls.push(mousePositionControl);
     }
 
     if( mapConfig.controls.gazetteer ) {
@@ -89,6 +88,17 @@ function init() {
 
     if( mapConfig.controls.overview ) {
         styles += `.ol-custom-overviewmap, .ol-custom-overviewmap.ol-uncollapsible { top:auto; bottom:24px; left:auto; right:8px; } `;
+
+        // Define the overview map control.
+        var overviewMapControl = new ol.control.OverviewMap({
+            className: 'ol-overviewmap ol-custom-overviewmap',
+            collapsible: false,
+            layers: [
+                new ol.layer.Tile({
+                    source: tileSource
+                })
+            ]
+        });
 
         map.controls.push(overviewMapControl);
     }
@@ -141,6 +151,7 @@ function init() {
         markerLayer = new ol.layer.Vector({
             name: 'marker',
             source: new ol.source.Cluster({
+                // distance: 20,
                 source: new ol.source.Vector({
                     features: markerFeatures
                 })
@@ -199,25 +210,65 @@ function init() {
             });
 
             map.getViewport().style.cursor = hit ? 'pointer' : '';
-
-            if( mapConfig.controls.coordinates ) {
-                var templateOSGB = 'Easting: {x} Northing: {y}';
-                var strOSGB = ol.coordinate.format(evt.coordinate, templateOSGB, 0);
-
-                var templateWGS84 = 'Longitude: {x} Latitude: {y}';
-                var strWGS84 = ol.coordinate.format(ol.proj.transform(evt.coordinate, 'EPSG:27700', 'EPSG:4326'), templateWGS84, 6);
-
-                var gridRef = toGridRef({ ea: evt.coordinate[0], no: evt.coordinate[1] });
-                var strGridRef = 'OS Grid Reference: ' + gridRef.text;
-
-                document.getElementById('info').innerHTML = strOSGB + '<br>' + strWGS84 + '<br>' + strGridRef;
-            }
         });
 
         // Create a 'change:resolution' event handler which hides any popups when view resolution changes.
         map.getView().on('change:resolution', function(evt) {
             popup.hide();
         });
+    }
+
+    /**
+     * Returns string with templated details for the input coordinate location.
+     */
+    function getCoordinateString(coord) {
+        var templateOSGB = 'Easting: {x} Northing: {y}';
+        var strOSGB = ol.coordinate.format(coord, templateOSGB, 0);
+
+        var templateWGS84 = 'Longitude: {x} Latitude: {y}';
+        var strWGS84 = ol.coordinate.format(ol.proj.transform(coord, 'EPSG:27700', 'EPSG:4326'), templateWGS84, 6);
+
+        var gridRef = toGridRef({ ea: coord[0], no: coord[1] });
+        var strGridRef = 'OS Grid Reference: ' + gridRef.text;
+
+        return strOSGB + '<br>' + strWGS84 + '<br>' + strGridRef;
+    }
+
+    /**
+     * Convert northing and easting to letter and number grid system.
+     */
+    function toGridRef(coordinates) {
+        var prefixes = new Array(
+            new Array("SV","SW","SX","SY","SZ","TV","TW"),
+            new Array("SQ","SR","SS","ST","SU","TQ","TR"),
+            new Array("SL","SM","SN","SO","SP","TL","TM"),
+            new Array("SF","SG","SH","SJ","SK","TF","TG"),
+            new Array("SA","SB","SC","SD","SE","TA","TB"),
+            new Array("NV","NW","NX","NY","NZ","OV","OW"),
+            new Array("NQ","NR","NS","NT","NU","OQ","OR"),
+            new Array("NL","NM","NN","NO","NP","OL","OM"),
+            new Array("NF","NG","NH","NJ","NK","OF","OG"),
+            new Array("NA","NB","NC","ND","NE","OA","OB"),
+            new Array("HV","HW","HX","HY","HZ","JV","JW"),
+            new Array("HQ","HR","HS","HT","HU","JQ","JR"),
+            new Array("HL","HM","HN","HO","HP","JL","JM")
+        );
+
+        var x = Math.floor(coordinates.ea / 100000);
+        var y = Math.floor(coordinates.no / 100000);
+
+        var prefix = prefixes[y][x];
+
+        var e = Math.round(coordinates.ea % 100000);
+        var n = Math.round(coordinates.no % 100000);
+
+        e = String(e).padStart(5, '0');
+        n = String(n).padStart(5, '0');
+
+        var text = prefix + ' ' + e + ' ' + n,
+            html = prefix + '&thinsp;' + e + '&thinsp;' + n;
+
+        return { text: text, html: html };
     }
 
     /**
@@ -330,8 +381,7 @@ function init() {
 
         // If the start and end coordinates are within 5m of each other - create a single marker
         // feature at the end of the route.
-        if( Math.abs(startCoord[0] - endCoord[0]) <= 5 &&
-            Math.abs(startCoord[1] - endCoord[1]) <= 5 ) {
+        if( new ol.geom.LineString([ startCoord, endCoord ]).getLength() <= 5 ) {
             features = [
                 new ol.Feature({
                     icon: 'startend',
@@ -473,41 +523,4 @@ function init() {
 
         return style;
     }
-}
-
-/**
- * Convert northing and easting to letter and number grid system.
- */
-function toGridRef(coordinates) {
-    var prefixes = new Array(
-        new Array("SV","SW","SX","SY","SZ","TV","TW"),
-        new Array("SQ","SR","SS","ST","SU","TQ","TR"),
-        new Array("SL","SM","SN","SO","SP","TL","TM"),
-        new Array("SF","SG","SH","SJ","SK","TF","TG"),
-        new Array("SA","SB","SC","SD","SE","TA","TB"),
-        new Array("NV","NW","NX","NY","NZ","OV","OW"),
-        new Array("NQ","NR","NS","NT","NU","OQ","OR"),
-        new Array("NL","NM","NN","NO","NP","OL","OM"),
-        new Array("NF","NG","NH","NJ","NK","OF","OG"),
-        new Array("NA","NB","NC","ND","NE","OA","OB"),
-        new Array("HV","HW","HX","HY","HZ","JV","JW"),
-        new Array("HQ","HR","HS","HT","HU","JQ","JR"),
-        new Array("HL","HM","HN","HO","HP","JL","JM")
-    );
-
-    var x = Math.floor(coordinates.ea / 100000);
-    var y = Math.floor(coordinates.no / 100000);
-
-    var prefix = prefixes[y][x];
-
-    var e = Math.round(coordinates.ea % 100000);
-    var n = Math.round(coordinates.no % 100000);
-
-    e = String(e).padStart(5, '0');
-    n = String(n).padStart(5, '0');
-
-    var text = prefix + ' ' + e + ' ' + n,
-        html = prefix + '&thinsp;' + e + '&thinsp;' + n;
-
-    return { text: text, html: html };
 }
