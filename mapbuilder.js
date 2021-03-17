@@ -1,4 +1,4 @@
-// mapbuilder.js v0.2.1
+// mapbuilder.js v0.2.2
 
 var map, routeLayer, routeMarkerLayer, markerLayer;
 var styles = '';
@@ -97,7 +97,11 @@ function init() {
                 new ol.layer.Tile({
                     source: tileSource
                 })
-            ]
+            ],
+            view: new ol.View({
+                projection: 'EPSG:27700',
+                extent: extent
+            })
         });
 
         map.controls.push(overviewMapControl);
@@ -470,13 +474,13 @@ function init() {
      * Returns data-driven style object for the marker clusters.
      */
     function markerStyle(feature) {
-      var color = feature.get('features')[0].get('color') || mapConfig.markers.color;
+        var color = feature.get('features')[0].get('color') || mapConfig.markers.color;
 
-      // Define an SVG object to be used for the marker icon.
-      var svg = `<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 141.7 141.7">
-                   <path fill="${color}" d="m70.9 7.1c-24.8 0-44.9 16.5-44.9 48.4s44.9 79.1 44.9 79.1 44.9-47.2 44.9-79.1c-.1-31.9-20.2-48.4-44.9-48.4z"/>
-                   <path fill="#fff" d="m98.4 52.6c0 15.2-12.3 27.5-27.5 27.5s-27.6-12.3-27.6-27.5 12.4-27.6 27.6-27.6 27.5 12.4 27.5 27.6"/>
-                 </svg>`;
+        // Define an SVG object to be used for the marker icon.
+        var svg = `<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 141.7 141.7">
+                     <path fill="${color}" d="m70.9 7.1c-24.8 0-44.9 16.5-44.9 48.4s44.9 79.1 44.9 79.1 44.9-47.2 44.9-79.1c-.1-31.9-20.2-48.4-44.9-48.4z"/>
+                     <path fill="#fff" d="m98.4 52.6c0 15.2-12.3 27.5-27.5 27.5s-27.6-12.3-27.6-27.5 12.4-27.6 27.6-27.6 27.5 12.4 27.5 27.6"/>
+                   </svg>`;
 
         var img = new Image();
         img.src = 'data:image/svg+xml,' + escape(svg);

@@ -152,6 +152,9 @@ Once you have set your map configuration options; along with [optionally] adding
 **Version 0.2.1** (December 2020)
 - Minor bug fixes; and new implementation of mouse position control for improved functionality on touch devices.
 
+**Version 0.2.2** (March 2021)
+- Added custom view for the overview map control.
+
 ## Notes
 
 <sup>[1]</sup> Access to the 1:50 000 and 1:25 000 Scale Colour Raster datasets which are provided via the Leisure style require a valid OS Data Hub project API key with a [Premium plan](https://osdatahub.os.uk/plans).
@@ -160,6 +163,6 @@ Once you have set your map configuration options; along with [optionally] adding
 
 ## Licence
 
-The contents of this repository are licensed under the [Open Government Licence 3.0](https://www.nationalarchives.gov.uk/doc/open-government-licence/version/)
+The contents of this repository are licensed under the [Open Government Licence 3.0](https://www.nationalarchives.gov.uk/doc/open-government-licence/version/).
 
 ![Logo](http://www.nationalarchives.gov.uk/images/infoman/ogl-symbol-41px-retina-black.png "OGL logo")
