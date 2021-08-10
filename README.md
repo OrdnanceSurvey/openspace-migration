@@ -12,6 +12,8 @@ Live versions of the included examples to demonstrate usage:
   - Create a simple map.
 - [Location map](https://labs.os.uk/public/openspace-migration/src/examples/location-map.html)
   - Display a marker icon.
+- [Marker clusters](https://labs.os.uk/public/openspace-migration/src/examples/marker-clusters.html)
+  - Add multiple markers with clustering.
 - [Route map](https://labs.os.uk/public/openspace-migration/src/examples/route-map.html)
   - Add a route.
 - [Route map (GPX)](https://labs.os.uk/public/openspace-migration/src/examples/route-map-gpx.html)
