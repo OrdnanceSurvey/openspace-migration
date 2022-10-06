@@ -6,23 +6,23 @@ JavaScript wrapper file to display Ordnance Survey maps with markers and/or a ro
 
 ## Examples
 
-Live versions of the included examples to demonstrate usage:
+Interactive versions of the examples to demonstrate usage:
 
-- [Basic map](https://labs.os.uk/public/openspace-migration/src/examples/basic-map.html)
+- [Basic map](https://labs.os.uk/public/openspace-migration/code-playground/#basic-map)
   - Create a simple map.
-- [Location map](https://labs.os.uk/public/openspace-migration/src/examples/location-map.html)
+- [Location map](https://labs.os.uk/public/openspace-migration/code-playground/#location-map)
   - Display a marker icon.
-- [Marker clusters](https://labs.os.uk/public/openspace-migration/src/examples/marker-clusters.html)
+- [Marker clusters](https://labs.os.uk/public/openspace-migration/code-playground/#marker-clusters)
   - Add multiple markers with clustering.
-- [Route map](https://labs.os.uk/public/openspace-migration/src/examples/route-map.html)
+- [Route map](https://labs.os.uk/public/openspace-migration/code-playground/#route-map)
   - Add a route.
-- [Route map (GPX)](https://labs.os.uk/public/openspace-migration/src/examples/route-map-gpx.html)
+- [Route map (GPX)](https://labs.os.uk/public/openspace-migration/code-playground/#route-map-gpx)
   - Overlay a route using an external GPX file.
-- [Coordinate information](https://labs.os.uk/public/openspace-migration/src/examples/control-coordinates.html)
+- [Coordinate information](https://labs.os.uk/public/openspace-migration/code-playground/#control-coordinates)
   - Display coordinates of the mouse pointer.
-- [Gazetteer search](https://labs.os.uk/public/openspace-migration/src/examples/control-gazetteer.html)
+- [Gazetteer search](https://labs.os.uk/public/openspace-migration/code-playground/#control-gazetteer)
   - Incorporate a gazetteer search.
-- [Overview map](https://labs.os.uk/public/openspace-migration/src/examples/control-overview.html)
+- [Overview map](https://labs.os.uk/public/openspace-migration/code-playground/#control-overview)
   - Include an overview map.
 
 ## Installation
